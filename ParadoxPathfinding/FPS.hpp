@@ -1,8 +1,6 @@
-#ifndef FPS_HPP
-#define FPS_HPP
-
-#include <iostream>
+#pragma once
 #include <SFML/Graphics.hpp>
+#include <iostream>
 
 class FPS
 {
@@ -73,5 +71,3 @@ void FPS::DrawFPSCount(sf::RenderWindow& window) {
 	text.setPosition(0, 0);
 	window.draw(text);
 }
-
-#endif
