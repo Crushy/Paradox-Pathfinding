@@ -1,105 +1,98 @@
 #include "stdafx.h"
 
-#include <SFML/Graphics.hpp>
+#include <iostream>
 
-#include "FPS.hpp"
-
-#include <ostream>
-#include <array>
-#include <memory>
-
-typedef unsigned char GridValue;
-
-struct Vector2UInt {
-	unsigned int x = 0;
-	unsigned int y = 0;
-
-	Vector2UInt() {
-		this->x = 0;
-		this->y = 0;
-	}
-
-	Vector2UInt(unsigned int x, unsigned int y) {
-		this->x = x;
-		this->y = y;
-	}
-
-	bool operator== (const Vector2UInt &other) const {
-		return (this->x == other.x && this->y == other.y);
-	}
-
-	friend std::ostream &operator<<(std::ostream &os, Vector2UInt const &ourselves) {
-		return os << "Vector2UInt(" << ourselves.x << " , " << ourselves.y << ")";
-	}
-};
-
-struct GridItem {
-	Vector2UInt coordinate;
-	GridValue value = 1;
-
-	GridItem()
-	{
-		this->coordinate = Vector2UInt();
-		this->value = GridValue();
-	}
-
-	GridItem(Vector2UInt coordinate, GridValue val) {
-		this->coordinate = coordinate;
-		this->value = val;
-	}
-
-	friend std::ostream &operator<<(std::ostream &os, GridItem const &ourselves) {
-		return os << "GridItem( Value:" << ourselves.value << " " << ourselves.coordinate << " )";
-	}
-	
-};
+#include <queue>
+#include <list>
+#include <algorithm>
+#include <unordered_map>
+#include <functional>
 
 class GridData {
+
 	public :
-		GridValue* grid; //Ideally this should be using array_view but I have no idea GLSL is allowed
+		typedef unsigned char GridValue;
+
+		#define Traversable 1
+		#define Impassable  0
+
+		struct GridLocation {
+			int x = 0;
+			int y = 0;
+
+			struct hash_GridLocation {
+				size_t operator()(const GridLocation &location) const {
+					return std::hash<int>()(location.x) ^ std::hash<int>()(location.y);
+				}
+			};
+
+			GridLocation() {
+				this->x = 0;
+				this->y = 0;
+			}
+
+			GridLocation(unsigned int x, unsigned int y) {
+				this->x = x;
+				this->y = y;
+			}
+
+			bool operator== (const GridLocation &other) const {
+				return (this->x == other.x && this->y == other.y);
+			}
+
+			bool operator!= (const GridLocation &other) const {
+				return (this->x != other.x || this->y != other.y);
+			}
+
+			friend std::ostream &operator<<(std::ostream &os, GridLocation const &ourselves) {
+				return os << "GridLocation(" << ourselves.x << " , " << ourselves.y << ")";
+			}
+		};
 		
-		GridItem GetElement(int x, int y) {
-			return GridItem(Vector2UInt(x,y), this->grid[Coordinates2DToArray(x, y, this->_width)]);
+		
+		GridValue GetElement(int x, int y) {
+			return this->grid[Coordinates2DToArray(x, y, this->_width)];
 		}
 
-		int Coordinates2DToArray(int x, int y, int width) {
+		GridValue GetElement(GridLocation loc) {
+			return GetElement(loc.x,loc.y);
+		}
+
+		inline int Coordinates2DToArray(int x, int y, int width) {
 			return width*y + x;
 		}
-		
-		GridData(unsigned char* grid, int width, int height, Vector2UInt entry, Vector2UInt goal) {
+		/*
+		inline GridData::GridLocation CoordinatesArrayTo2D(int i, int width) {
+			return GridData::GridLocation(i % width, i / width);
+		}*/
+
+		GridData(const unsigned char* grid, const int width, const int height) {
 
 			this->grid = grid;
 
 			this->_width = width;
 			this->_height = height;
 
-			this->_entry = entry;
-			this->_goal = goal;
 			return;
 		}
 
-		void GetNeighbours(Vector2UInt coord, std::vector<GridItem>& toFill) {
-			toFill.clear();
-
+		void GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill) {
+			
 			//North
 			if (coord.y > 0) {
-				toFill.push_back(GetElement(coord.x, coord.y - 1));
-				//toFill. = ;
+				toFill.push_back(GridLocation(coord.x, coord.y - 1));
 			}
 			//West
 			if (coord.x > 0) {
-				toFill.push_back(GetElement(coord.x - 1, coord.y));
-				//toFill[index] = ;
+				toFill.push_back(GridLocation(coord.x - 1, coord.y));
 			}
 			//East
-			if (coord.x < this->_width) {
-				toFill.push_back(GetElement(coord.x + 1, coord.y));
-				//toFill[index] = ;
+			if (coord.x < this->_width-1) {
+				toFill.push_back(GridLocation(coord.x + 1, coord.y));
 			}
 			//South
-			if (coord.y < this->_height) {
-				toFill.push_back(GetElement(coord.x, coord.y + 1));
-				//toFill[index] = ;
+			if (coord.y < this->_height-1) {
+				toFill.push_back(GridLocation(coord.x, coord.y + 1));
 			}
 			/*
 			for (std::vector<GridItem>::const_iterator j = toFill.begin(); j != toFill.end(); ++j)
@@ -109,38 +102,129 @@ class GridData {
 
 		}
 
-		const Vector2UInt entry() 
-		{ 
-			return _entry; 
-		}
 
-		const Vector2UInt goal()
+
+		void Pathfind(GridLocation entry, GridLocation goal)
 		{
-			return _goal;
+			std::priority_queue<CandidateRecord> candidates;
+			std::unordered_map<typename GridLocation, VisitedRecord,GridLocation::hash_GridLocation> visited;
+
+			CandidateRecord startRecord = CandidateRecord
+			{ 
+				entry,
+				GridLocation(-1,-1),
+				0,
+				heuristic(entry,goal)
+			};
+			
+			candidates.push(startRecord);
+
+			std::vector<GridLocation> toFill = std::vector<GridLocation>(max_neighbours);
+
+			while (candidates.size() > 0) {
+				CandidateRecord currentNode = candidates.top();
+				
+
+				if (currentNode.node == goal) { //Found the goal, exit
+					std::cout << "done" << std::endl;
+					break;
+				}
+				else {
+					candidates.pop();
+
+					toFill.clear();
+					GetNeighbours(currentNode.node,toFill);
+					std::cout << "visiting" << std::endl;
+
+					for (auto next : toFill) {
+						int costToNext = currentNode.costSoFar + 1; //It always costs 1 to move to the next node
+						if (GetElement(next) == Impassable) {
+							continue;
+						}
+						if (visited.count(next) <= 0 || costToNext < visited[next].costSoFar) {
+							visited[next].costSoFar = costToNext;
+							visited[next].node = next;
+							visited[next].previous = currentNode.node;
+
+							candidates.push(CandidateRecord
+								{
+									next,
+									currentNode.node,
+									costToNext,
+									costToNext + heuristic(next, goal)
+								}
+							);
+						}
+						
+					}
+
+				}
+
+			}
+
+			if (candidates.size() <= 0) {
+				std::cout << -1 << std::endl;
+				return;
+			}
+
+			//Reverse
+			VisitedRecord aux = visited[goal];
+			do {
+				std::cout << Coordinates2DToArray(aux.node.x,aux.node.y,_width) << std::endl;
+				//std::cout << (aux.node) << std::endl;
+				aux = visited[aux.previous];
+			} while (aux.node != entry);
+			
+
+			return;
 		}
 
-		const unsigned int width()
+		//Getters
+		const int width()
 		{
 			return _width;
 		}
 
-		const unsigned int height()
+		const int height()
 		{
 			return _height;
 		}
 
 	private :
-		unsigned int _width;
-		unsigned int _height;
-		Vector2UInt _entry;
-		Vector2UInt _goal;
+		int _width = 0;
+		int _height = 0;
+		const GridValue* grid; //Ideally this should be using array_view but I have no idea if GLSL is allowed
 
+		struct VisitedRecord {
+
+			GridLocation node;
+			GridLocation previous;
+			int costSoFar;
+		};
+
+		struct CandidateRecord {
+
+			GridLocation node;
+			GridLocation previous;
+			int costSoFar;
+			int estimatedTotalCost;
+
+			bool operator< (const CandidateRecord& other) const
+			{
+				return estimatedTotalCost > other.estimatedTotalCost;
+			}
+		};
+
+		//Estimate distance between nodes
+		inline int heuristic(GridData::GridLocation a, GridData::GridLocation b) {
+			return abs(a.x - b.x) + abs(a.y - b.y);
+		}
+
+		const int max_neighbours = 4;
 	
 };
 
-Vector2UInt CoordinatesArrayTo2D(int i, int width) {
-	return Vector2UInt(i % width, i / width);
-}
+
 
 
 float lerp(float value, float start, float end)
@@ -148,27 +232,30 @@ float lerp(float value, float start, float end)
 	return start + (end - start) * value;
 }
 
-
-
-sf::Vector2f circlePos;
-
 int FindPath(const int nStartX, const int nStartY,
 	const int nTargetX, const int nTargetY,
 	const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
 	int* pOutBuffer, const int nOutBufferSize) {
 
+	GridData gridData = GridData(pMap, nMapWidth, nMapHeight);
+
+	for (int i = 0; i < gridData.height(); i++)
+	{
+		for (int j = 0; j < gridData.width(); j++)
+		{
+			std::cout << gridData.GetElement(j, i) + 1;
+		}
+
+		std::cout << std::endl;
+	}
+
+	gridData.Pathfind(GridData::GridLocation(nStartX,nStartY), GridData::GridLocation(nTargetX,nTargetY));
+
+
 	return 0;
 }
 
 
-void update(const sf::RenderWindow& win, float delta) {
-	//circlePos.x = win.getSize().x/2.f;
-	//circlePos.y = lerp((sin(delta*2) / 2.f + .5f), 100, win.getSize().y - 100);
-}
-
-float gridMargin = 5;
-
-Vector2UInt cursorPosition;
 
 //Clamps from min (inclusive) to max (exclusive)
 int clamp(int val, int min, int max) {
@@ -177,201 +264,27 @@ int clamp(int val, int min, int max) {
 	return ret;
 }
 
-int main()
-{
 
-	sf::RenderWindow window(sf::VideoMode(400, 400), "Pathfinding");
-
-	sf::CircleShape bouncyCircle(100.f);
-	bouncyCircle.setOrigin(100.f, 100.f);
-	bouncyCircle.setFillColor(sf::Color::Green);
-	
-
-	//Window settings
-	//window.setVerticalSyncEnabled(false);
-	//window.setFramerateLimit(60);
-
-
-	FPS fpsCounter;
-	
-	
-	sf::Clock clock;
-	sf::Time elapsed = sf::Time::Zero;
-
-	sf::Clock sessionClock;
-	
-	
-	sf::RectangleShape gridSquare(sf::Vector2f(10.f, 10.f));
-
+int main() {
 	//Init Pathfinding
+	
 
-	unsigned char map[] = {
-		1, 1, 1, 1,
-		0, 1, 0, 1,
-		0, 1, 1, 1
-	};
+	GridData::GridLocation entry = GridData::GridLocation(0, 0);
+	GridData::GridLocation goal = GridData::GridLocation(1, 2);
 
-	int width = 4;
-	int height = 3;
+	//Example 1
+	unsigned char pMap1[] = { 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1 };
+	int pOutBuffer1[12];
+	FindPath(0, 0, 1, 2, pMap1, 4, 3, pOutBuffer1, 12);
 
-	GridData data = GridData(map,width,height,Vector2UInt(2,0),Vector2UInt(0,2));
+	std::cout << "#############" << std::endl;
 
-	while (window.isOpen())
-	{
+	//Example 2
+	unsigned char pMap2[] = { 0, 0, 1, 0, 1, 1, 1, 0, 1 };
+	int pOutBuffer2[7];
+	FindPath(2, 0, 0, 2, pMap2, 3, 3, pOutBuffer2, 7);
 
-		clock.restart();
-
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			switch (event.type)
-			{
-				case sf::Event::Closed :
-					window.close();
-					break;
-				case sf::Event::Resized :
-					window.setView
-					(
-						sf::View
-						(
-							sf::FloatRect
-							(
-								0.f, 0.f,
-								static_cast<float>(window.getSize().x),
-								static_cast<float>(window.getSize().y)
-							)
-						)
-					);
-					
-					break;
-				case sf::Event::KeyPressed :
-					switch (event.key.code)
-					{
-					case sf::Keyboard::W:
-					case sf::Keyboard::Numpad8:
-					case sf::Keyboard::Up:
-						cursorPosition.y = clamp(cursorPosition.y - 1, 0, data.height());
-						break;
-					case sf::Keyboard::S:
-					case sf::Keyboard::Numpad2:
-					case sf::Keyboard::Down:
-						cursorPosition.y = clamp(cursorPosition.y + 1, 0, data.height());
-						break;
-					case sf::Keyboard::A:
-					case sf::Keyboard::Numpad4:
-					case sf::Keyboard::Left:
-						cursorPosition.x = clamp(cursorPosition.x - 1, 0, data.width());
-						break;
-					case sf::Keyboard::D:
-					case sf::Keyboard::Numpad6:
-					case sf::Keyboard::Right:
-						cursorPosition.x = clamp(cursorPosition.x + 1, 0, data.width() );
-						break;
-					case sf::Keyboard::Escape:
-						window.close();
-						break;
-					}
-				
-				default:
-					break;
-				}
-
-		}
-
-		window.clear(sf::Color(0, 225, 225));
-
-		update(window, sessionClock.getElapsedTime().asSeconds());
-		
-		
-		bouncyCircle.setPosition(circlePos);
-		//bouncyCircle.setPosition(window.getSize().x,0);
-
-
-		int smallestDimension = window.getSize().x;// < window.getSize().y ? window.getSize().x: window.getSize().y;
-		float padding = gridMargin;
-		float gridSpace = smallestDimension - padding*2;
-		float squareSize = ((gridSpace - gridMargin*(width-1)) / width);
-
-		gridSquare.setSize(sf::Vector2f(gridSpace, gridSpace));
-		gridSquare.setPosition(padding, padding);
-		gridSquare.setFillColor(sf::Color::Black);
-		window.draw(gridSquare);
-
-		//float padding = (smallestDimension - (squareSize*_width + gridMargin * 4)) / 2;
-
-
-		std::vector<GridItem> test = std::vector<GridItem>(4); //Start with size 4 since we only need 4 at most
-		data.GetNeighbours(cursorPosition, test);
-
-		for (int i = 0; i < width*height; i++)
-		{
-			Vector2UInt coord = CoordinatesArrayTo2D(i,width);
-
-			gridSquare.setSize(sf::Vector2f(squareSize,squareSize));
-			gridSquare.setPosition
-				(
-					padding + coord.x*(squareSize + gridMargin),
-					padding +coord.y*(squareSize + gridMargin)
-				);
-
-			GridValue currTileVal = data.grid[i];
-			switch (currTileVal) 
-			{
-				case 1:
-					gridSquare.setFillColor(sf::Color::White);
-					break;
-				case 0:
-					gridSquare.setFillColor(sf::Color(127, 127, 127));
-					break;
-				default :
-					gridSquare.setFillColor(sf::Color::Magenta);
-					break;
-			}
-			
-			if (coord == data.entry()) {
-				gridSquare.setFillColor(sf::Color::Blue);
-			}
-			else if (coord == data.goal()) {
-				gridSquare.setFillColor(sf::Color::Red);
-			}
-
-			for (std::vector<GridItem>::const_iterator j = test.begin(); j != test.end(); ++j)
-			{
-				std::cout << *j << std::endl;
-				if ((j->coordinate) == coord) {
-					gridSquare.setFillColor(sf::Color::Green);
-					break;
-				}
-				else {
-					continue;
-				}
-			}
-
-
-			
-
-			window.draw(gridSquare);
-		}
-
-		
-		//window.draw(bouncyCircle);
-		
-
-		fpsCounter.DrawFPSCount(window);
-		window.display();
-
-		
-		
-		elapsed = clock.getElapsedTime();
-		float sleepTime = 1.f / 120.f - elapsed.asSeconds();
-		if (sleepTime > 0.f)
-		{
-			sf::sleep(sf::seconds(sleepTime));
-		}
-		
-		fpsCounter.update();
-	}
+	
 
 	return 0;
 }
-
