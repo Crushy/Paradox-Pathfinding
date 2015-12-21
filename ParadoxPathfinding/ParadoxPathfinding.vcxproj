@@ -157,6 +157,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PathFinder.hpp" />
     <ClInclude Include="FPS.hpp" />
     <ClInclude Include="GraphicalDisplay.hpp" />
     <ClInclude Include="Utils.hpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PathFinder.cpp" />
     <ClCompile Include="GraphicalDisplay.cpp" />
     <ClCompile Include="ParadoxPathfinding.cpp" />
     <ClCompile Include="SquareGrid.cpp" />

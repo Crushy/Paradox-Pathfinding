@@ -6,18 +6,12 @@ typedef unsigned char GridValue;
 
 #include <iostream>
 #include <vector>
-#include <queue>
-#include <unordered_map>
 
+namespace Grid {
 
-class SquareGrid
-{
-public:
-	SquareGrid();
-	SquareGrid(const unsigned char* grid, const int width, const int height);
-
-	~SquareGrid();
-
+	/*
+	A 2D grid location
+	*/
 	struct GridLocation {
 		int x = 0;
 		int y = 0;
@@ -51,57 +45,46 @@ public:
 		}
 	};
 
-	inline int SquareGrid::Coordinates2DToArray(int x, int y, int width)
+	/*
+	A square grid. Ideally should implement a Generic Grid interface.
+	*/
+	class SquareGrid
 	{
-		return width*y + x;
-	}
+	public:
+		//Consts
+		static const int max_neighbours = 4;
 
-	inline SquareGrid::GridLocation SquareGrid::CoordinatesArrayTo2D(int i, int width)
-	{
-		return SquareGrid::GridLocation(i % width, i / width);
-	}
+		//Constructors,Destructors
+		SquareGrid();
+		SquareGrid(const unsigned char* grid, const int width, const int height);
 
-	void Pathfind(GridLocation entry, GridLocation goal);
+		~SquareGrid();
 
-	GridValue SquareGrid::GetElement(int x, int y);
-	GridValue SquareGrid::GetElement(GridLocation loc);
-
-	inline int SquareGrid::heuristic(GridLocation a, GridLocation b);
-
-	const int SquareGrid::width();
-	const int SquareGrid::height();
-
-	//template <> int heuristic_Function(GridLocation a, GridLocation b);
-
-private:
-	int _width = 0;
-	int _height = 0;
-	const GridValue* grid; //Ideally this should be using array_view but I have no idea if GLSL is allowed
-
-	struct VisitedRecord {
-
-		GridLocation node;
-		GridLocation previous;
-		int costSoFar;
-	};
-
-	struct CandidateRecord {
-
-		GridLocation node;
-		GridLocation previous;
-		int costSoFar;
-		int estimatedTotalCost;
-
-		bool operator< (const CandidateRecord& other) const
+		//Inlines
+		inline int SquareGrid::Coordinates2DToArray(int x, int y, int width)
 		{
-			return estimatedTotalCost > other.estimatedTotalCost;
+			return width*y + x;
 		}
+
+		inline SquareGrid::GridLocation SquareGrid::CoordinatesArrayTo2D(int i, int width)
+		{
+			return GridLocation(i % width, i / width);
+		}
+
+		//Method declarations
+		GridValue SquareGrid::GetElement(int x, int y);
+		GridValue SquareGrid::GetElement(GridLocation loc);
+		void GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill);
+
+		const int SquareGrid::width();
+		const int SquareGrid::height();
+
+	private:
+		int _width = 0;
+		int _height = 0;
+		const GridValue* grid; //Ideally this should be using array_view but GLSL is probably not allowed
+
 	};
 
-	const int max_neighbours = 4;
 
-	void GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill);
-
-};
-
-
+}

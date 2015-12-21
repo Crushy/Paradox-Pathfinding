@@ -13,7 +13,7 @@ public:
 	void Loop();
 	void update(const sf::RenderWindow & win, float delta);
 protected:
-	SquareGrid displayedGrid;
+	Grid::SquareGrid displayedGrid;
 	sf::RenderWindow& windowHandle;
 
 	float squareSize;

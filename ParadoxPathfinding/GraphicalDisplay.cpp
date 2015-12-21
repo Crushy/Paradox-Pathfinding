@@ -108,7 +108,7 @@ void DisplayGridSFML::InitializeDisplay()
 
 		for (int i = 0; i < displayedGrid.width()*displayedGrid.height(); i++)
 		{
-			SquareGrid::GridLocation coordLoc = this->displayedGrid.CoordinatesArrayTo2D(i, displayedGrid.width());
+			Grid::GridLocation coordLoc = this->displayedGrid.CoordinatesArrayTo2D(i, displayedGrid.width());
 
 			gridSquare.setSize(sf::Vector2f(squareSize, squareSize));
 			gridSquare.setPosition
@@ -141,8 +141,6 @@ void DisplayGridSFML::InitializeDisplay()
 		}
 
 		//Cursor display
-		//std::vector<GridItem> test = std::vector<GridItem>(4); //Start with size 4 since we only need 4 at most
-		//data.GetNeighbours(cursorPosition, test);
 		float cursorSize = squareSize / 2;
 		cursorIndicator.setRadius(cursorSize);
 		cursorIndicator.setPosition(

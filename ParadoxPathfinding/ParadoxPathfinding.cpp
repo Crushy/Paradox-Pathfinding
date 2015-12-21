@@ -1,13 +1,20 @@
 #pragma once
 #include <iostream>
 #include "SquareGrid.hpp"
+#include "PathFinder.hpp"
+
+//Estimate distance between nodes
+inline int ManhattanDistance(Grid::GridLocation a, Grid::GridLocation b) {
+	return abs(a.x - b.x) + abs(a.y - b.y);
+}
+
 
 int FindPath(const int nStartX, const int nStartY,
 	const int nTargetX, const int nTargetY,
 	const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
 	int* pOutBuffer, const int nOutBufferSize) {
 
-	SquareGrid gridData = SquareGrid(pMap, nMapWidth, nMapHeight);
+	Grid::SquareGrid gridData = Grid::SquareGrid(pMap, nMapWidth, nMapHeight);
 
 	for (int i = 0; i < gridData.height(); i++)
 	{
@@ -19,7 +26,8 @@ int FindPath(const int nStartX, const int nStartY,
 		std::cout << std::endl;
 	}
 
-	gridData.Pathfind(SquareGrid::GridLocation(nStartX, nStartY), SquareGrid::GridLocation(nTargetX, nTargetY));
+	PathFinder path(gridData);
+	path.Pathfind(Grid::GridLocation(nStartX, nStartY), Grid::GridLocation(nTargetX, nTargetY), ManhattanDistance);
 
 
 	return 0;
@@ -29,8 +37,8 @@ auto main() {
 	//Init Pathfinding
 	
 
-	SquareGrid::GridLocation entry = SquareGrid::GridLocation(0, 0);
-	SquareGrid::GridLocation goal = SquareGrid::GridLocation(1, 2);
+	Grid::GridLocation entry = Grid::GridLocation(0, 0);
+	Grid::GridLocation goal = Grid::GridLocation(1, 2);
 
 	//Example 1
 	unsigned char pMap1[] = { 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1 };
