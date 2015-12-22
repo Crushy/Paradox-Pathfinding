@@ -1,30 +1,36 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "SquareGrid.hpp"
-#include "Utils.hpp"
 #include "FPS.hpp"
 
 class DisplayGridSFML
 {
 public:
-	DisplayGridSFML(sf::RenderWindow window);
+	DisplayGridSFML(const Grid::SquareGrid& displayedGrid);
 	~DisplayGridSFML();
-	void InitializeDisplay();
-	void Loop();
-	void update(const sf::RenderWindow & win, float delta);
+	
+	void Run();
 protected:
-	Grid::SquareGrid displayedGrid;
-	sf::RenderWindow& windowHandle;
+	const Grid::SquareGrid& displayedGrid = Grid::SquareGrid();
 
-	float squareSize;
+	sf::RenderWindow* window;
+	void InitializeDisplay();
+	float squareSize = 100;
 
 private:
 	float gridMargin = 5;
 	float padding;
 	float gridSpace;
+
+
 	sf::Vector2i cursorPosition;
 
-	void ResizeWindow(sf::Vector2i newSize);
+	//Shapes
+	sf::RectangleShape gridSquare;
+	sf::CircleShape cursorIndicator;
+
+
+	void ResizeWindow(sf::Vector2u newSize);
 
 	FPS fpsCounter;
 

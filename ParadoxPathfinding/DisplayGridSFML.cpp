@@ -1,8 +1,24 @@
-#include "GraphicalDisplay.hpp"
+#include "DisplayGridSFML.hpp"
 
-DisplayGridSFML::DisplayGridSFML(sf::RenderWindow window) :
-	windowHandle(window)
+namespace Utils {
+	inline float lerp(float value, float start, float end)
+	{
+		return start + (end - start) * value;
+	}
+
+	//Clamps from min (inclusive) to max (exclusive)
+	inline int clamp(int val, int min, int max)
+	{
+		int ret = std::min(val, max - 1);
+		ret = std::max(ret, min);
+		return ret;
+	}
+}
+
+DisplayGridSFML::DisplayGridSFML(const Grid::SquareGrid& grid):displayedGrid(grid)
 {
+	//this->displayedGrid=displayedGrid;
+	InitializeDisplay();
 	return;
 }
 
@@ -13,47 +29,38 @@ DisplayGridSFML::~DisplayGridSFML()
 
 void DisplayGridSFML::InitializeDisplay()
 {
-	//sf::Window win = sf::Window();
-	windowHandle.setSize(sf::Vector2u(400,400));
-	windowHandle.setTitle("Pathfinding");
-
-	sf::CircleShape cursorIndicator(100.f);
-	cursorIndicator.setFillColor(sf::Color::Green);
+	window = new sf::RenderWindow();
+	window->create(sf::VideoMode(400, 400), "Pathfinding");
 
 	//Window settings
-	//window.setVerticalSyncEnabled(false);
-	//window.setFramerateLimit(60);
+	//window->setVerticalSyncEnabled(false);
+	//window->setFramerateLimit(60);
 
+	ResizeWindow(sf::Vector2u(400, 400));
 
-	sf::RectangleShape gridSquare(sf::Vector2f(10.f, 10.f));
+	cursorIndicator.setFillColor(sf::Color::Magenta);
 
-	while (windowHandle.isOpen())
+	return;
+}
+
+void DisplayGridSFML::Run()
+{
+	sf::Event event;
+	while (window->isOpen())
 	{
 
 		clock.restart();
 
-		sf::Event event;
-		while (windowHandle.pollEvent(event))
+		
+		while (window->pollEvent(event))
 		{
 			switch (event.type)
 			{
 			case sf::Event::Closed:
-				windowHandle.close();
+				window->close();
 				break;
 			case sf::Event::Resized:
-				windowHandle.setView
-					(
-						sf::View
-						(
-							sf::FloatRect
-							(
-								0.f, 0.f,
-								static_cast<float>(windowHandle.getSize().x),
-								static_cast<float>(windowHandle.getSize().y)
-								)
-							)
-						);
-
+				ResizeWindow(window->getSize());
 				break;
 
 			case sf::Event::KeyPressed: //Move the cursor
@@ -80,7 +87,7 @@ void DisplayGridSFML::InitializeDisplay()
 					cursorPosition.x = Utils::clamp(cursorPosition.x + 1, 0, displayedGrid.width());
 					break;
 				case sf::Keyboard::Escape:
-					windowHandle.close();
+					window->close();
 					break;
 				}
 
@@ -89,17 +96,15 @@ void DisplayGridSFML::InitializeDisplay()
 			}
 
 		}
-
-		this->windowHandle.clear(sf::Color(0, 225, 225));
-
-		update(this->windowHandle, sessionClock.getElapsedTime().asSeconds());
-
-
 		
+		window->clear(sf::Color(0, 225, 225));
+		
+		//update(this->window, sessionClock.getElapsedTime().asSeconds());
+
 		gridSquare.setSize(sf::Vector2f(gridSpace, gridSpace));
 		gridSquare.setPosition(padding, padding);
 		gridSquare.setFillColor(sf::Color::Black);
-		this->windowHandle.draw(gridSquare);
+		window->draw(gridSquare);
 
 		//float padding = (smallestDimension - (squareSize*_width + gridMargin * 4)) / 2;
 
@@ -108,7 +113,7 @@ void DisplayGridSFML::InitializeDisplay()
 
 		for (int i = 0; i < displayedGrid.width()*displayedGrid.height(); i++)
 		{
-			Grid::GridLocation coordLoc = this->displayedGrid.CoordinatesArrayTo2D(i, displayedGrid.width());
+			Grid::GridLocation coordLoc = displayedGrid.CoordinatesArrayTo2D(i, displayedGrid.width());
 
 			gridSquare.setSize(sf::Vector2f(squareSize, squareSize));
 			gridSquare.setPosition
@@ -137,7 +142,7 @@ void DisplayGridSFML::InitializeDisplay()
 			else if (coord == data.goal()) {
 			gridSquare.setFillColor(sf::Color::Red);
 			}*/
-			windowHandle.draw(gridSquare);
+			window->draw(gridSquare);
 		}
 
 		//Cursor display
@@ -146,13 +151,13 @@ void DisplayGridSFML::InitializeDisplay()
 		cursorIndicator.setPosition(
 			padding + cursorPosition.x*(squareSize + gridMargin),
 			padding + cursorPosition.y*(squareSize + gridMargin)
-			);
+		);
 
-		windowHandle.draw(cursorIndicator);
+		window->draw(cursorIndicator);
 
 
-		fpsCounter.DrawFPSCount(this->windowHandle);
-		windowHandle.display();
+		fpsCounter.DrawFPSCount(window);
+		window->display();
 
 
 
@@ -165,24 +170,30 @@ void DisplayGridSFML::InitializeDisplay()
 
 		fpsCounter.update();
 	}
-
-	return;
 }
 
-void DisplayGridSFML::Loop()
+void DisplayGridSFML::ResizeWindow(sf::Vector2u newSize)
 {
-}
-
-void DisplayGridSFML::update(const sf::RenderWindow& win, float delta) {
-
-}
-
-void DisplayGridSFML::ResizeWindow(sf::Vector2i newSize)
-{
-	int smallestDimension = windowHandle.getSize().x;// < window.getSize().y ? window.getSize().x: window.getSize().y;
+	int smallestDimension = window->getSize().x < window->getSize().y ? window->getSize().x: window->getSize().y;
+	int largestDimension = window->getSize().x < window->getSize().y ? window->getSize().y : window->getSize().x;
+	window->setSize(sf::Vector2u(largestDimension, largestDimension));
+	
 	this->padding = gridMargin;
 	this->gridSpace = smallestDimension - padding * 2;
 	this->squareSize = ((gridSpace - gridMargin*(displayedGrid.width() - 1)) / displayedGrid.width());
 
+
+	window->setView
+		(
+			sf::View
+			(
+				sf::FloatRect
+				(
+					0.f, 0.f,
+					static_cast<float>(window->getSize().x),
+					static_cast<float>(window->getSize().y)
+					)
+				)
+			);
 }
 

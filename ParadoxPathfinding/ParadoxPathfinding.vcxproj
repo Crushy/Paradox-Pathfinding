@@ -159,15 +159,13 @@
   <ItemGroup>
     <ClInclude Include="PathFinder.hpp" />
     <ClInclude Include="FPS.hpp" />
-    <ClInclude Include="GraphicalDisplay.hpp" />
-    <ClInclude Include="Utils.hpp" />
+    <ClInclude Include="DisplayGridSFML.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SquareGrid.hpp" />
-    <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="PathFinder.cpp" />
-    <ClCompile Include="GraphicalDisplay.cpp" />
+    <ClCompile Include="DisplayGridSFML.cpp" />
     <ClCompile Include="ParadoxPathfinding.cpp" />
     <ClCompile Include="SquareGrid.cpp" />
   </ItemGroup>

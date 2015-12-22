@@ -21,15 +21,18 @@ namespace Grid {
 	{
 	}
 
-	GridValue SquareGrid::GetElement(int x, int y) {
+	GridValue SquareGrid::GetElement(int x, int y) const
+	{
 		return this->grid[Coordinates2DToArray(x, y, this->_width)];
 	}
 
-	GridValue SquareGrid::GetElement(GridLocation loc) {
+	GridValue SquareGrid::GetElement(GridLocation loc) const
+	{
 		return GetElement(loc.x, loc.y);
 	}
 
-	void SquareGrid::GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill) {
+	void SquareGrid::GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill) const
+	{
 
 		//North
 		if (coord.y > 0) {
@@ -56,13 +59,25 @@ namespace Grid {
 	}
 
 	//Getters
-	const int SquareGrid::width()
+	int SquareGrid::width() const
 	{
 		return _width;
 	}
 
-	const int SquareGrid::height()
+	int SquareGrid::height() const
 	{
 		return _height;
+	}
+	void SquareGrid::ToConsole() const
+	{
+		for (int i = 0; i < _height; i++)
+		{
+			for (int j = 0; j < _width; j++)
+			{
+				std::cout << GetElement(j, i) + 1;
+			}
+
+			std::cout << std::endl;
+		}
 	}
 }

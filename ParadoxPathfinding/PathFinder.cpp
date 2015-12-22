@@ -39,8 +39,10 @@ void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_
 			candidates.pop();
 
 			toFill.clear();
+
+			std::cout << "Visiting " << currentNode.node << std::endl;
 			grid.GetNeighbours(currentNode.node, toFill);
-			std::cout << "visiting" << std::endl;
+			
 
 			for (auto next : toFill) {
 				int costToNext = currentNode.costSoFar + 1; //It always costs 1 to move to the next node

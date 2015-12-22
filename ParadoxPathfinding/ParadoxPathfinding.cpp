@@ -1,7 +1,8 @@
 #pragma once
 #include <iostream>
-#include "SquareGrid.hpp"
+//#include "SquareGrid.hpp"
 #include "PathFinder.hpp"
+#include "DisplayGridSFML.hpp"
 
 //Estimate distance between nodes
 inline int ManhattanDistance(Grid::GridLocation a, Grid::GridLocation b) {
@@ -16,15 +17,7 @@ int FindPath(const int nStartX, const int nStartY,
 
 	Grid::SquareGrid gridData = Grid::SquareGrid(pMap, nMapWidth, nMapHeight);
 
-	for (int i = 0; i < gridData.height(); i++)
-	{
-		for (int j = 0; j < gridData.width(); j++)
-		{
-			std::cout << gridData.GetElement(j, i) + 1;
-		}
-
-		std::cout << std::endl;
-	}
+	gridData.ToConsole();
 
 	PathFinder path(gridData);
 	path.Pathfind(Grid::GridLocation(nStartX, nStartY), Grid::GridLocation(nTargetX, nTargetY), ManhattanDistance);
@@ -52,7 +45,9 @@ auto main() {
 	int pOutBuffer2[7];
 	FindPath(2, 0, 0, 2, pMap2, 3, 3, pOutBuffer2, 7);
 
-	
+	Grid::SquareGrid& testGrid = Grid::SquareGrid(pMap2, 3, 3);
+	DisplayGridSFML disp(testGrid);
+	disp.Run();
 
 	return;
 }

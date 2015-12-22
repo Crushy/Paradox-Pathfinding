@@ -61,23 +61,25 @@ namespace Grid {
 		~SquareGrid();
 
 		//Inlines
-		inline int SquareGrid::Coordinates2DToArray(int x, int y, int width)
+		inline int SquareGrid::Coordinates2DToArray(int x, int y, int width) const
 		{
 			return width*y + x;
 		}
 
-		inline SquareGrid::GridLocation SquareGrid::CoordinatesArrayTo2D(int i, int width)
+		inline SquareGrid::GridLocation SquareGrid::CoordinatesArrayTo2D(int i, int width) const
 		{
 			return GridLocation(i % width, i / width);
 		}
 
 		//Method declarations
-		GridValue SquareGrid::GetElement(int x, int y);
-		GridValue SquareGrid::GetElement(GridLocation loc);
-		void GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill);
+		GridValue SquareGrid::GetElement(int x, int y) const;
+		GridValue SquareGrid::GetElement(GridLocation loc) const;
+		void GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill) const;
 
-		const int SquareGrid::width();
-		const int SquareGrid::height();
+		int width() const;
+		int height() const;
+
+		void ToConsole() const;
 
 	private:
 		int _width = 0;
