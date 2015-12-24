@@ -1,13 +1,14 @@
 #include "PathFinder.hpp"
 
-PathFinder::PathFinder(SquareGrid& grid):
-	grid(grid)
+PathFinder::PathFinder(const SquareGrid& gridRef):
+	grid(gridRef)
 {
 
 }
 
 PathFinder::~PathFinder()
 {
+	std::cout << "We are gone :("<<std::endl;
 }
 
 void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func)
@@ -18,7 +19,7 @@ void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_
 	CandidateRecord startRecord = CandidateRecord
 	{
 		entry,
-		GridLocation(-1,-1),
+		GridLocation(-1,-1), //Just a random invalid coordinate
 		0,
 		heurist_func(entry,goal)
 	};

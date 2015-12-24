@@ -26,11 +26,6 @@ namespace Grid {
 		return this->grid[Coordinates2DToArray(x, y, this->_width)];
 	}
 
-	GridValue SquareGrid::GetElement(GridLocation loc) const
-	{
-		return GetElement(loc.x, loc.y);
-	}
-
 	void SquareGrid::GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill) const
 	{
 
@@ -68,16 +63,5 @@ namespace Grid {
 	{
 		return _height;
 	}
-	void SquareGrid::ToConsole() const
-	{
-		for (int i = 0; i < _height; i++)
-		{
-			for (int j = 0; j < _width; j++)
-			{
-				std::cout << GetElement(j, i) + 1;
-			}
 
-			std::cout << std::endl;
-		}
-	}
 }

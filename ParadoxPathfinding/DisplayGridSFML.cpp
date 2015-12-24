@@ -1,23 +1,9 @@
 #include "DisplayGridSFML.hpp"
 
-namespace Utils {
-	inline float lerp(float value, float start, float end)
-	{
-		return start + (end - start) * value;
-	}
-
-	//Clamps from min (inclusive) to max (exclusive)
-	inline int clamp(int val, int min, int max)
-	{
-		int ret = std::min(val, max - 1);
-		ret = std::max(ret, min);
-		return ret;
-	}
-}
-
-DisplayGridSFML::DisplayGridSFML(const Grid::SquareGrid& grid):displayedGrid(grid)
+DisplayGridSFML::DisplayGridSFML(const Grid::SquareGrid& grid):
+	displayedGrid(grid),
+	pathfinder(PathFinder(grid))
 {
-	//this->displayedGrid=displayedGrid;
 	InitializeDisplay();
 	return;
 }
@@ -43,14 +29,22 @@ void DisplayGridSFML::InitializeDisplay()
 	return;
 }
 
+void DisplayGridSFML::RecalculatePath()
+{
+	
+	pathfinder.grid.ToConsole();
+	//pathfinder.Pathfind(entry,goal,Utils::ManhattanDistance);
+	
+}
+
 void DisplayGridSFML::Run()
 {
 	sf::Event event;
 	while (window->isOpen())
 	{
-
+		//pathfinder.grid.ToConsole();
+		/**/
 		clock.restart();
-
 		
 		while (window->pollEvent(event))
 		{
@@ -62,7 +56,6 @@ void DisplayGridSFML::Run()
 			case sf::Event::Resized:
 				ResizeWindow(window->getSize());
 				break;
-
 			case sf::Event::KeyPressed: //Move the cursor
 				switch (event.key.code)
 				{
@@ -89,8 +82,15 @@ void DisplayGridSFML::Run()
 				case sf::Keyboard::Escape:
 					window->close();
 					break;
+				case sf::Keyboard::Num1:
+					this->entry = Grid::GridLocation(cursorPosition.x, cursorPosition.y);
+					RecalculatePath();
+					break;
+				case sf::Keyboard::Num2:
+					this->goal = Grid::GridLocation(cursorPosition.x, cursorPosition.y);
+					RecalculatePath();
+					break;
 				}
-
 			default:
 				break;
 			}
@@ -101,15 +101,7 @@ void DisplayGridSFML::Run()
 		
 		//update(this->window, sessionClock.getElapsedTime().asSeconds());
 
-		gridSquare.setSize(sf::Vector2f(gridSpace, gridSpace));
-		gridSquare.setPosition(padding, padding);
-		gridSquare.setFillColor(sf::Color::Black);
-		window->draw(gridSquare);
-
 		//float padding = (smallestDimension - (squareSize*_width + gridMargin * 4)) / 2;
-
-
-
 
 		for (int i = 0; i < displayedGrid.width()*displayedGrid.height(); i++)
 		{
@@ -135,13 +127,15 @@ void DisplayGridSFML::Run()
 				gridSquare.setFillColor(sf::Color::Magenta);
 				break;
 			}
-			/*
-			if (coord == data.entry()) {
-			gridSquare.setFillColor(sf::Color::Blue);
+			
+			if (coordLoc == entry) 
+			{
+				gridSquare.setFillColor(sf::Color::Blue);
 			}
-			else if (coord == data.goal()) {
-			gridSquare.setFillColor(sf::Color::Red);
-			}*/
+			else if (coordLoc == goal)
+			{
+				gridSquare.setFillColor(sf::Color::Red);
+			}
 			window->draw(gridSquare);
 		}
 

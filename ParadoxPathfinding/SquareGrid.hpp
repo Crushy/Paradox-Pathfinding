@@ -73,13 +73,28 @@ namespace Grid {
 
 		//Method declarations
 		GridValue SquareGrid::GetElement(int x, int y) const;
-		GridValue SquareGrid::GetElement(GridLocation loc) const;
+		inline GridValue GetElement(GridLocation loc) const
+		{
+			return GetElement(loc.x, loc.y);
+		}
 		void GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill) const;
 
 		int width() const;
 		int height() const;
 
-		void ToConsole() const;
+		inline void ToConsole() const {
+			//std::cout << _height << std::endl;
+
+			for (int i = 0; i < _height; i++)
+			{
+				for (int j = 0; j < _width; j++)
+				{
+					std::cout << GetElement(j, i) + 1;
+				}
+
+				std::cout << std::endl;
+			}
+		}
 
 	private:
 		int _width = 0;

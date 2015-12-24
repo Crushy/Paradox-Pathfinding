@@ -2,17 +2,20 @@
 #include "SquareGrid.hpp"
 #include <queue>
 #include <unordered_map>
+#include "Utils.hpp"
 
 using namespace Grid;
 
 class PathFinder
 {
 public:
-	PathFinder(SquareGrid& grid);
+	PathFinder(const SquareGrid& gridRef);
 	~PathFinder();
 	using HeurFn = int(GridLocation, GridLocation);
 	void Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func);
 	
+	const SquareGrid& grid;
+
 private:
 	struct CandidateRecord {
 
@@ -34,6 +37,6 @@ private:
 		int costSoFar;
 	};
 
-	SquareGrid& grid;
+	
 };
 
