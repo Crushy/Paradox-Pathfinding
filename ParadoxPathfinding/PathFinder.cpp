@@ -52,7 +52,7 @@ std::list<GridLocation>* PathFinder::Pathfind(GridLocation entry, GridLocation g
 				if (grid.GetElement(next) == Impassable) {
 					continue;
 				}
-				if (costToNext < visited[next].costSoFar || visited.count(next) <= 0 ) {
+				if (visited.count(next) <= 0 || costToNext < visited[next].costSoFar) {
 					visited[next].costSoFar = costToNext;
 					visited[next].node = next;
 					visited[next].previous = currentNode.node;
