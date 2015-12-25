@@ -1,8 +1,8 @@
 #include "DisplayGridSFML.hpp"
 
-DisplayGridSFML::DisplayGridSFML(const Grid::SquareGrid& grid):
+DisplayGridSFML::DisplayGridSFML(const Grid::SquareGrid& grid, PathFinder& newpathfinder):
 	displayedGrid(grid),
-	pathfinder(PathFinder(grid))
+	pathfinder(newpathfinder)
 {
 	InitializeDisplay();
 	return;
@@ -32,8 +32,8 @@ void DisplayGridSFML::InitializeDisplay()
 void DisplayGridSFML::RecalculatePath()
 {
 	
-	pathfinder.grid.ToConsole();
-	//pathfinder.Pathfind(entry,goal,Utils::ManhattanDistance);
+	//pathfinder.grid.ToConsole();
+	pathfound = pathfinder.Pathfind(entry,goal,Utils::ManhattanDistance);
 	
 }
 
@@ -139,21 +139,33 @@ void DisplayGridSFML::Run()
 			window->draw(gridSquare);
 		}
 
+		if (pathfound != nullptr) {
+			for each (GridLocation var in *pathfound)
+			{
+				gridSquare.setPosition(
+					padding + var.x*(squareSize + gridMargin),
+					padding + var.y*(squareSize + gridMargin)
+					);
+				gridSquare.setFillColor(sf::Color::Green);
+				window->draw(gridSquare);
+			}
+			
+		}
+
+		fpsCounter.DrawFPSCount(window);
+		
+
 		//Cursor display
 		float cursorSize = squareSize / 2;
 		cursorIndicator.setRadius(cursorSize);
 		cursorIndicator.setPosition(
 			padding + cursorPosition.x*(squareSize + gridMargin),
 			padding + cursorPosition.y*(squareSize + gridMargin)
-		);
+			);
 
 		window->draw(cursorIndicator);
 
-
-		fpsCounter.DrawFPSCount(window);
 		window->display();
-
-
 
 		elapsed = clock.getElapsedTime();
 		float sleepTime = 1.f / 120.f - elapsed.asSeconds();

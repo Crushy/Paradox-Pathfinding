@@ -1,6 +1,7 @@
 #pragma once
 #include "SquareGrid.hpp"
 #include <queue>
+#include <array>
 #include <unordered_map>
 #include "Utils.hpp"
 
@@ -12,7 +13,9 @@ public:
 	PathFinder(const SquareGrid& gridRef);
 	~PathFinder();
 	using HeurFn = int(GridLocation, GridLocation);
-	void Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func);
+
+	//TODO: fix the magic number
+	std::list<GridLocation>* Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func);
 	
 	const SquareGrid& grid;
 

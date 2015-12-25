@@ -11,8 +11,10 @@ PathFinder::~PathFinder()
 	std::cout << "We are gone :("<<std::endl;
 }
 
-void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func)
+std::list<GridLocation>* PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func)
 {
+	std::vector<GridLocation> toFill = std::vector<GridLocation>(grid.max_neighbours);
+
 	std::priority_queue<CandidateRecord> candidates;
 	std::unordered_map<typename GridLocation, VisitedRecord, GridLocation::hash_GridLocation> visited;
 
@@ -26,7 +28,7 @@ void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_
 
 	candidates.push(startRecord);
 
-	std::vector<GridLocation> toFill = std::vector<GridLocation>(grid.max_neighbours);
+	
 
 	while (candidates.size() > 0) {
 		CandidateRecord currentNode = candidates.top();
@@ -71,19 +73,23 @@ void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_
 
 	}
 
+	std::list<GridLocation>* results = new std::list<GridLocation>();
+
 	if (candidates.size() <= 0) {
 		std::cout << -1 << std::endl;
-		return;
+		return results;
 	}
 
 	//Reverse
 	VisitedRecord aux = visited[goal];
 	do {
+		results->push_back(aux.node);
 		std::cout << grid.Coordinates2DToArray(aux.node.x, aux.node.y, grid.width()) << std::endl;
 		//std::cout << (aux.node) << std::endl;
 		aux = visited[aux.previous];
+		
 	} while (aux.node != entry);
 
 
-	return;
+	return results;
 }

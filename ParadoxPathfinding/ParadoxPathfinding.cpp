@@ -50,16 +50,8 @@ auto main() {
 	FindPath(4, 0, 0, 2, pMap3, 20, 10, pOutBuffer3, 7);
 
 	Grid::SquareGrid& testGrid = Grid::SquareGrid(pMap3, 20, 10);
-	DisplayGridSFML disp(testGrid);
+	PathFinder& pathfinder = PathFinder(testGrid);
+	DisplayGridSFML disp(testGrid,pathfinder);
 	disp.Run();
-	//while (true)
-	//disp.pathfinder.grid.ToConsole();
-
-
-	//disp.pathfinder.grid.ToConsole();
-	//
-
-	//disp.pathfinder.grid.ToConsole();
-
 	return;
 }
