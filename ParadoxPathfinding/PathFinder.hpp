@@ -14,7 +14,6 @@ public:
 	~PathFinder();
 	using HeurFn = int(GridLocation, GridLocation);
 
-	//TODO: fix the magic number
 	std::list<GridLocation>* Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func);
 	
 	const SquareGrid& grid;
@@ -22,8 +21,7 @@ public:
 private:
 	struct CandidateRecord {
 
-		GridLocation node;
-		GridLocation previous;
+		GridLocation coordinate;
 		int costSoFar;
 		int estimatedTotalCost;
 
@@ -34,8 +32,7 @@ private:
 	};
 
 	struct VisitedRecord {
-
-		GridLocation node;
+		GridLocation coordinate;
 		GridLocation previous;
 		int costSoFar;
 	};
