@@ -15,8 +15,10 @@ std::list<GridLocation>* PathFinder::Pathfind(GridLocation entry, GridLocation g
 {
 	std::vector<GridLocation> neighbours = std::vector<GridLocation>(grid.max_neighbours);
 
+	visited = new std::unordered_map<typename GridLocation, VisitedRecord, GridLocation::hash_GridLocation>();
+
 	std::priority_queue<CandidateRecord> candidates;
-	std::unordered_map<typename GridLocation, VisitedRecord, GridLocation::hash_GridLocation> visited;
+	
 
 	CandidateRecord startRecord = CandidateRecord
 	{
@@ -49,10 +51,10 @@ std::list<GridLocation>* PathFinder::Pathfind(GridLocation entry, GridLocation g
 				if (grid.GetElement(neighbour) == Impassable) {
 					continue;
 				}
-				else if (visited.count(neighbour) <= 0 || costToNext < visited[neighbour].costSoFar) {
-					visited[neighbour].costSoFar = costToNext;
-					visited[neighbour].coordinate = neighbour;
-					visited[neighbour].previous = currentNode.coordinate;
+				else if (visited->count(neighbour) <= 0 || costToNext < (*visited)[neighbour].costSoFar) {
+					(*visited)[neighbour].costSoFar = costToNext;
+					(*visited)[neighbour].coordinate = neighbour;
+					(*visited)[neighbour].previous = currentNode.coordinate;
 
 					candidates.push(CandidateRecord
 					{
@@ -89,7 +91,7 @@ std::list<GridLocation>* PathFinder::Pathfind(GridLocation entry, GridLocation g
 		results->push_back(aux);
 		std::cout << "Going back through " << aux << std::endl;
 		//std::cout << (aux.coordinate) << std::endl;
-		aux = visited[aux].previous;
+		aux = (*visited)[aux].previous;
 		
 	} while (aux != entry);
 

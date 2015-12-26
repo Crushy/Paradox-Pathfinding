@@ -10,15 +10,6 @@ using namespace Grid;
 class PathFinder
 {
 public:
-	PathFinder(const SquareGrid& gridRef);
-	~PathFinder();
-	using HeurFn = int(GridLocation, GridLocation);
-
-	std::list<GridLocation>* Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func);
-	
-	const SquareGrid& grid;
-
-private:
 	struct CandidateRecord {
 
 		GridLocation coordinate;
@@ -36,6 +27,19 @@ private:
 		GridLocation previous;
 		int costSoFar;
 	};
+
+	PathFinder(const SquareGrid& gridRef);
+	~PathFinder();
+	using HeurFn = int(GridLocation, GridLocation);
+
+	std::list<GridLocation>* Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func);
+	
+	const SquareGrid& grid;
+
+	std::unordered_map<typename GridLocation, VisitedRecord, GridLocation::hash_GridLocation>* visited;
+
+private:
+	
 
 	
 };

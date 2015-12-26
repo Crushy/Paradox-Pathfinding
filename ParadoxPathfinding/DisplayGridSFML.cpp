@@ -24,7 +24,7 @@ void DisplayGridSFML::InitializeDisplay()
 
 	ResizeWindow(sf::Vector2u(400, 400));
 
-	cursorIndicator.setFillColor(sf::Color::Magenta);
+	gridCircle.setFillColor(sf::Color::Magenta);
 
 	return;
 }
@@ -127,16 +127,20 @@ void DisplayGridSFML::Run()
 				gridSquare.setFillColor(sf::Color::Magenta);
 				break;
 			}
-			
-			if (coordLoc == entry) 
-			{
-				gridSquare.setFillColor(sf::Color::Blue);
-			}
-			else if (coordLoc == goal)
-			{
-				gridSquare.setFillColor(sf::Color::Red);
-			}
 			window->draw(gridSquare);
+		}
+
+		if (pathfound != nullptr) {
+			for each (auto var in (*pathfinder.visited))
+			{
+				gridSquare.setPosition(
+					padding + var.second.coordinate.x*(squareSize + gridMargin),
+					padding + var.second.coordinate.y*(squareSize + gridMargin)
+					);
+				gridSquare.setFillColor(sf::Color(128, 255, 128));
+				window->draw(gridSquare);
+			}
+			
 		}
 
 		if (pathfound != nullptr) {
@@ -149,21 +153,41 @@ void DisplayGridSFML::Run()
 				gridSquare.setFillColor(sf::Color::Green);
 				window->draw(gridSquare);
 			}
-			
+
 		}
+
+		//Entry
+		{
+			gridCircle.setPosition(
+				padding + entry.x*(squareSize + gridMargin),
+				padding + entry.y*(squareSize + gridMargin)
+				);
+			gridCircle.setFillColor(sf::Color::Blue);
+			window->draw(gridCircle);
+		}
+		//Goal
+		{
+			gridCircle.setPosition(
+				padding + goal.x*(squareSize + gridMargin),
+				padding + goal.y*(squareSize + gridMargin)
+				);
+			gridCircle.setFillColor(sf::Color::Red);
+			window->draw(gridCircle);
+		}
+
 
 		fpsCounter.DrawFPSCount(window);
 		
 
 		//Cursor display
 		float cursorSize = squareSize / 2;
-		cursorIndicator.setRadius(cursorSize);
-		cursorIndicator.setPosition(
+		gridCircle.setRadius(cursorSize);
+		gridCircle.setPosition(
 			padding + cursorPosition.x*(squareSize + gridMargin),
 			padding + cursorPosition.y*(squareSize + gridMargin)
 			);
-
-		window->draw(cursorIndicator);
+		gridCircle.setFillColor(sf::Color::Magenta);
+		window->draw(gridCircle);
 
 		window->display();
 

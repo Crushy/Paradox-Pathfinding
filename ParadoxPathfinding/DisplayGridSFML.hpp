@@ -31,7 +31,7 @@ private:
 
 	//Shapes
 	sf::RectangleShape gridSquare;
-	sf::CircleShape cursorIndicator;
+	sf::CircleShape gridCircle;
 
 	Grid::GridLocation entry;
 	Grid::GridLocation goal;
