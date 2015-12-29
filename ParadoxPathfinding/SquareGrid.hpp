@@ -79,8 +79,16 @@ namespace Grid {
 		}
 		void GetNeighbours(GridLocation coord, std::vector<GridLocation>& toFill) const;
 
-		int width() const;
-		int height() const;
+		//Getters
+		const int SquareGrid::width() const
+		{
+			return _width;
+		}
+
+		const int SquareGrid::height() const
+		{
+			return _height;
+		}
 
 		inline void ToConsole() const {
 			//std::cout << _height << std::endl;

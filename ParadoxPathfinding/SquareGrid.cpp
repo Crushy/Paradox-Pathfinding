@@ -52,16 +52,4 @@ namespace Grid {
 		}*/
 
 	}
-
-	//Getters
-	int SquareGrid::width() const
-	{
-		return _width;
-	}
-
-	int SquareGrid::height() const
-	{
-		return _height;
-	}
-
 }
