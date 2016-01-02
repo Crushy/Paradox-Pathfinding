@@ -1,8 +1,8 @@
 #include "DisplayGridSFML.hpp"
 
-DisplayGridSFML::DisplayGridSFML(const Grid::SquareGrid& grid):
+DisplayGridSFML::DisplayGridSFML(const Grid::SquareGrid& grid, PathFinder& newpathfinder):
 	displayedGrid(grid),
-	pathfinder(PathFinder(grid))
+	pathfinder(newpathfinder)
 {
 	InitializeDisplay();
 	return;
@@ -24,7 +24,7 @@ void DisplayGridSFML::InitializeDisplay()
 
 	ResizeWindow(sf::Vector2u(400, 400));
 
-	cursorIndicator.setFillColor(sf::Color::Magenta);
+	gridCircle.setFillColor(sf::Color::Magenta);
 
 	return;
 }
@@ -32,8 +32,8 @@ void DisplayGridSFML::InitializeDisplay()
 void DisplayGridSFML::RecalculatePath()
 {
 	
-	pathfinder.grid.ToConsole();
-	//pathfinder.Pathfind(entry,goal,Utils::ManhattanDistance);
+	//pathfinder.grid.ToConsole();
+	pathfound = pathfinder.Pathfind(entry,goal,Utils::ManhattanDistance);
 	
 }
 
@@ -127,33 +127,69 @@ void DisplayGridSFML::Run()
 				gridSquare.setFillColor(sf::Color::Magenta);
 				break;
 			}
-			
-			if (coordLoc == entry) 
-			{
-				gridSquare.setFillColor(sf::Color::Blue);
-			}
-			else if (coordLoc == goal)
-			{
-				gridSquare.setFillColor(sf::Color::Red);
-			}
 			window->draw(gridSquare);
 		}
 
-		//Cursor display
-		float cursorSize = squareSize / 2;
-		cursorIndicator.setRadius(cursorSize);
-		cursorIndicator.setPosition(
-			padding + cursorPosition.x*(squareSize + gridMargin),
-			padding + cursorPosition.y*(squareSize + gridMargin)
-		);
+		if (pathfound != nullptr) {
+			for each (auto var in (*pathfinder.visited))
+			{
+				gridSquare.setPosition(
+					padding + var.second.coordinate.x*(squareSize + gridMargin),
+					padding + var.second.coordinate.y*(squareSize + gridMargin)
+					);
+				gridSquare.setFillColor(sf::Color(128, 255, 128));
+				window->draw(gridSquare);
+			}
+			
+		}
 
-		window->draw(cursorIndicator);
+		if (pathfound != nullptr) {
+			for each (GridLocation var in *pathfound)
+			{
+				gridSquare.setPosition(
+					padding + var.x*(squareSize + gridMargin),
+					padding + var.y*(squareSize + gridMargin)
+					);
+				gridSquare.setFillColor(sf::Color::Green);
+				window->draw(gridSquare);
+			}
+
+		}
+
+		//Entry
+		{
+			gridCircle.setPosition(
+				padding + entry.x*(squareSize + gridMargin),
+				padding + entry.y*(squareSize + gridMargin)
+				);
+			gridCircle.setFillColor(sf::Color::Blue);
+			window->draw(gridCircle);
+		}
+		//Goal
+		{
+			gridCircle.setPosition(
+				padding + goal.x*(squareSize + gridMargin),
+				padding + goal.y*(squareSize + gridMargin)
+				);
+			gridCircle.setFillColor(sf::Color::Red);
+			window->draw(gridCircle);
+		}
 
 
 		fpsCounter.DrawFPSCount(window);
+		
+
+		//Cursor display
+		float cursorSize = squareSize / 2;
+		gridCircle.setRadius(cursorSize);
+		gridCircle.setPosition(
+			padding + cursorPosition.x*(squareSize + gridMargin),
+			padding + cursorPosition.y*(squareSize + gridMargin)
+			);
+		gridCircle.setFillColor(sf::Color::Magenta);
+		window->draw(gridCircle);
+
 		window->display();
-
-
 
 		elapsed = clock.getElapsedTime();
 		float sleepTime = 1.f / 120.f - elapsed.asSeconds();

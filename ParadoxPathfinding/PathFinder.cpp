@@ -11,56 +11,56 @@ PathFinder::~PathFinder()
 	std::cout << "We are gone :("<<std::endl;
 }
 
-void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func)
+std::list<GridLocation>* PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_func)
 {
+	std::vector<GridLocation> neighbours = std::vector<GridLocation>(grid.max_neighbours);
+
+	visited = new std::unordered_map<typename GridLocation, VisitedRecord, GridLocation::hash_GridLocation>();
+
 	std::priority_queue<CandidateRecord> candidates;
-	std::unordered_map<typename GridLocation, VisitedRecord, GridLocation::hash_GridLocation> visited;
+	
 
 	CandidateRecord startRecord = CandidateRecord
 	{
 		entry,
-		GridLocation(-1,-1), //Just a random invalid coordinate
 		0,
 		heurist_func(entry,goal)
 	};
 
 	candidates.push(startRecord);
 
-	std::vector<GridLocation> toFill = std::vector<GridLocation>(grid.max_neighbours);
-
+	
+	CandidateRecord currentNode = startRecord;
 	while (candidates.size() > 0) {
-		CandidateRecord currentNode = candidates.top();
+		currentNode = candidates.top();
+		candidates.pop();
 
-
-		if (currentNode.node == goal) { //Found the goal, exit
-			std::cout << "done" << std::endl;
+		if (currentNode.coordinate == goal)
+		{
 			break;
 		}
-		else {
-			candidates.pop();
+		{
+			neighbours.clear();
 
-			toFill.clear();
-
-			std::cout << "Visiting " << currentNode.node << std::endl;
-			grid.GetNeighbours(currentNode.node, toFill);
+			std::cout << "Visiting " << currentNode.coordinate << std::endl;
+			grid.GetNeighbours(currentNode.coordinate, neighbours);
 			
 
-			for (auto next : toFill) {
-				int costToNext = currentNode.costSoFar + 1; //It always costs 1 to move to the next node
-				if (grid.GetElement(next) == Impassable) {
+			for (auto neighbour : neighbours) {
+				int costToNext = currentNode.costSoFar + 1; //It always costs 1 to move to the neighbour coordinate
+				if (grid.GetElement(neighbour) == Impassable) {
 					continue;
 				}
-				if (visited.count(next) <= 0 || costToNext < visited[next].costSoFar) {
-					visited[next].costSoFar = costToNext;
-					visited[next].node = next;
-					visited[next].previous = currentNode.node;
+				else if (visited->count(neighbour) <= 0 || costToNext < (*visited)[neighbour].costSoFar) {
+					(*visited)[neighbour].costSoFar = costToNext;
+					(*visited)[neighbour].coordinate = neighbour;
+					(*visited)[neighbour].previous = currentNode.coordinate;
 
 					candidates.push(CandidateRecord
 					{
-						next,
-						currentNode.node,
+						neighbour,
 						costToNext,
-						costToNext + heurist_func(next, goal)
+						costToNext + heurist_func(neighbour, goal)
 					}
 					);
 				}
@@ -71,19 +71,29 @@ void PathFinder::Pathfind(GridLocation entry, GridLocation goal, HeurFn heurist_
 
 	}
 
+	std::list<GridLocation>* results = new std::list<GridLocation>();
+
 	if (candidates.size() <= 0) {
 		std::cout << -1 << std::endl;
-		return;
+		return results;
+	}
+	else {
+		//visited[goal].previous = currentNode.coordinate;
 	}
 
 	//Reverse
-	VisitedRecord aux = visited[goal];
+
+
+	GridLocation aux = goal;
+
+	
 	do {
-		std::cout << grid.Coordinates2DToArray(aux.node.x, aux.node.y, grid.width()) << std::endl;
-		//std::cout << (aux.node) << std::endl;
-		aux = visited[aux.previous];
-	} while (aux.node != entry);
+		results->push_back(aux);
+		std::cout << "Going back through " << aux << std::endl;
+		//std::cout << (aux.coordinate) << std::endl;
+		aux = (*visited)[aux].previous;
+		
+	} while (aux != entry);
 
-
-	return;
+	return results;
 }

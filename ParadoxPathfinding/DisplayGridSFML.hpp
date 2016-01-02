@@ -7,7 +7,7 @@
 class DisplayGridSFML
 {
 public:
-	DisplayGridSFML(const Grid::SquareGrid& displayedGrid);
+	DisplayGridSFML(const Grid::SquareGrid& displayedGrid, PathFinder& newpathfinder);
 	~DisplayGridSFML();
 	
 	PathFinder& pathfinder;
@@ -31,7 +31,7 @@ private:
 
 	//Shapes
 	sf::RectangleShape gridSquare;
-	sf::CircleShape cursorIndicator;
+	sf::CircleShape gridCircle;
 
 	Grid::GridLocation entry;
 	Grid::GridLocation goal;
@@ -46,5 +46,7 @@ private:
 	sf::Clock sessionClock;
 
 	void RecalculatePath();
+
+	std::list<GridLocation>* pathfound;
 };
 
