@@ -204,9 +204,29 @@ void DisplayGridSFML::Run()
 
 void DisplayGridSFML::ResizeWindow(sf::Vector2u newSize)
 {
-	int smallestDimension = window->getSize().x < window->getSize().y ? window->getSize().x: window->getSize().y;
-	int largestDimension = window->getSize().x < window->getSize().y ? window->getSize().y : window->getSize().x;
-	window->setSize(sf::Vector2u(largestDimension, largestDimension));
+	float aspectRatio = (float)displayedGrid.width() / (float)displayedGrid.height();
+	std::cout << "Ratio: "<< std::fixed << aspectRatio << std::endl;
+
+	auto windowSize = window->getSize();
+	int largestDimension, smallestDimension;
+	sf::Vector2u desiredSize;
+	if (newSize.x < newSize.y) //Resizing and width is larger than height
+	{
+		largestDimension = windowSize.x;
+		smallestDimension = windowSize.y;
+		desiredSize = sf::Vector2u(window->getSize().y * aspectRatio, window->getSize().y);
+	}
+	else //Height is larger than Width
+	{
+		largestDimension = windowSize.y;
+		smallestDimension = windowSize.x;
+		
+		desiredSize = sf::Vector2u(window->getSize().x, window->getSize().x / aspectRatio);
+	}
+	
+	std::cout << "Size we want: " << desiredSize.x << "," << desiredSize.y << std::endl;
+
+	window->setSize(desiredSize);
 	
 	this->padding = gridMargin;
 	this->gridSpace = smallestDimension - padding * 2;
