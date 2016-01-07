@@ -54,6 +54,16 @@ namespace Grid {
 		//Consts
 		static const int max_neighbours = 4;
 
+		const inline int SquareGrid::Coordinates2DToArray(int x, int y, int width) const
+		{
+			return width*y + x;
+		}
+
+		const inline GridLocation SquareGrid::CoordinatesArrayTo2D(int i, int width) const
+		{
+			return GridLocation(i % width, i / width);
+		}
+
 		//Constructors,Destructors
 		SquareGrid();
 		SquareGrid(const unsigned char* grid, const int width, const int height);
@@ -61,15 +71,6 @@ namespace Grid {
 		~SquareGrid();
 
 		//Inlines
-		inline int SquareGrid::Coordinates2DToArray(int x, int y, int width) const
-		{
-			return width*y + x;
-		}
-
-		inline SquareGrid::GridLocation SquareGrid::CoordinatesArrayTo2D(int i, int width) const
-		{
-			return GridLocation(i % width, i / width);
-		}
 
 		//Method declarations
 		GridValue SquareGrid::GetElement(int x, int y) const;
