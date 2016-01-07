@@ -88,7 +88,7 @@ std::list<GridLocation>* PathFinder::Pathfind(GridLocation entry, GridLocation g
 
 	
 	do {
-		results->push_back(aux);
+		results->push_front(aux);
 		std::cout << "Going back through " << aux << std::endl;
 		//std::cout << (aux.coordinate) << std::endl;
 		aux = (*visited)[aux].previous;
