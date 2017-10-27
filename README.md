@@ -2,11 +2,15 @@
 
 My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) in clean, modern C++
 
-Windows only for now and non-working.
+At some point I added a UI to better debug the paths it would find. Press 1 to set a start point and 2 to set the end point. Use the arrow keys to navigate.
 
-#Original text
+Windows only for now.
 
-##Path-finding
+Original text
+============
+
+Path-finding
+
 Problem ID: paradoxpathTime limit: 5 secondsMemory limit: 1024 MB
 Difficulty
 hard
