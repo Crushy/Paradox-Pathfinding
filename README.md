@@ -1,6 +1,6 @@
 # ParadoxPathfinding
 
-My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) in clean, modern C++
+My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) in clean, modern C++. Keep in mind this is from someone that was forced to use C++98 for 3 years.
 
 I never got it to actually pass the tests before finding another job. At some point I added a UI to better debug the paths it would find. I honestly have no idea why it failed to get approved.
 
