@@ -2,9 +2,11 @@
 
 My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) in clean, modern C++
 
-At some point I added a UI to better debug the paths it would find. Press 1 to set a start point and 2 to set the end point. Use the arrow keys to navigate.
+I never got it to actually pass the tests before finding another job. At some point I added a UI to better debug the paths it would find. I honestly have no idea why it failed to get approved.
 
-Windows only for now.
+Press 1 to set a start point and 2 to set the end point. Use the arrow keys to navigate.
+
+Windows x86 only for now.
 
 Original text
 ============
@@ -68,7 +70,7 @@ You may safely assume that:
     int pOutBuffer[7];
     FindPath(2, 0, 0, 2, pMap, 3, 3, pOutBuffer, 7);
 
-    For this input FindPath must return −1−1.
+    For this input FindPath must return −1.
 
 ##Additional considerations
 
