@@ -18,6 +18,7 @@ public:
 
 		bool operator< (const CandidateRecord& other) const
 		{
+			//std::cout << "Comparing" << std::endl;
 			return estimatedTotalCost > other.estimatedTotalCost;
 		}
 	};

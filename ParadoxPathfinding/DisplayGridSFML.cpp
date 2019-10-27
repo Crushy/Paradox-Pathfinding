@@ -34,7 +34,9 @@ void DisplayGridSFML::RecalculatePath()
 	
 	//pathfinder.grid.ToConsole();
 	pathfound = pathfinder.Pathfind(entry,goal,Utils::ManhattanDistance);
-	
+	//PrintPath(pathfound,pa)
+	std::cout << "Length: " << pathfound->size() << std::endl;
+	//std::cout << "Length: " << pathfound->size() << std::endl;
 }
 
 void DisplayGridSFML::Run()
@@ -175,10 +177,6 @@ void DisplayGridSFML::Run()
 			window->draw(gridCircle);
 		}
 
-
-		fpsCounter.DrawFPSCount(window);
-		
-
 		//Cursor display
 		float cursorSize = squareSize / 2;
 		gridCircle.setRadius(cursorSize);
@@ -188,6 +186,9 @@ void DisplayGridSFML::Run()
 			);
 		gridCircle.setFillColor(sf::Color::Magenta);
 		window->draw(gridCircle);
+
+		//Draw fps counter
+		fpsCounter.DrawFPSCount(window);
 
 		window->display();
 
@@ -205,7 +206,7 @@ void DisplayGridSFML::Run()
 void DisplayGridSFML::ResizeWindow(sf::Vector2u newSize)
 {
 	float aspectRatio = (float)displayedGrid.width() / (float)displayedGrid.height();
-	std::cout << "Ratio: "<< std::fixed << aspectRatio << std::endl;
+	//std::cout << "Aspect ratio: "<< std::fixed << aspectRatio << std::endl;
 
 	auto windowSize = window->getSize();
 	int largestDimension, smallestDimension;
@@ -224,7 +225,7 @@ void DisplayGridSFML::ResizeWindow(sf::Vector2u newSize)
 		desiredSize = sf::Vector2u(window->getSize().x, window->getSize().x / aspectRatio);
 	}
 	
-	std::cout << "Size we want: " << desiredSize.x << "," << desiredSize.y << std::endl;
+	//std::cout << "Size we want: " << desiredSize.x << "," << desiredSize.y << std::endl;
 
 	window->setSize(desiredSize);
 	
