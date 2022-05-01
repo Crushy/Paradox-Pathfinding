@@ -17,7 +17,10 @@ Press 1 to set a start point and 2 to set the end point. Use the arrow keys to n
 
 ## Path-finding
 
-Problem ID: paradoxpathTime limit: 5 secondsMemory limit: 1024 MB
+Problem ID: paradoxpath
+Time limit: 5 seconds
+Memory limit: 1024 MB
+
 Difficulty
 hard
 
