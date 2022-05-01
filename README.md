@@ -4,18 +4,18 @@ My attempt at solving the [Paradox Path-finding Challenge](https://paradox.katti
 
 Made in Visual Studio using MSVC 142 and C++14. I have included only the relevant libraries for Windows x86.
 
-##Projects
-###Submission
-The First Project in the solution (`Submission`) is my actual submission. It's self-reliant and all the code is in one single (very messy) file.
+## Projects
+### Submission
+The First Project in the solution ( `Submission` ) is my actual submission. It's self-reliant and all the code is in one single (very messy) file.
 
-###UIPathFinder
-After failing the acceptance tests I wrote a simple UI to debug the paths it would find and check if there were any edge cases - this is the second project `UIPathFinder`.
+### UIPathFinder
+After failing the acceptance tests I wrote a simple UI to debug the paths it would find and check if there were any edge cases - this is the second project, `UIPathFinder`.
 
 Press 1 to set a start point and 2 to set the end point. Use the arrow keys to navigate.
 
 # Original text
 
-##Path-finding
+## Path-finding
 
 Problem ID: paradoxpathTime limit: 5 secondsMemory limit: 1024 MB
 Difficulty
@@ -24,7 +24,7 @@ hard
 Implement a path-finding algorithm in C++ that finds and returns a shortest path between two points in a 2-dimensional grid.
 
 Note that this specific problem can only be solved using C++.
-##API
+## API
 
 Your algorithm should provide an implementation of the following function declaration.
 
@@ -62,7 +62,7 @@ You may safely assume that:
 
     nOutBufferSize≥0nOutBufferSize≥0.
 
-##Examples
+## Examples
 
     unsigned char pMap[] = {1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1};
     int pOutBuffer[12];
@@ -76,6 +76,6 @@ You may safely assume that:
 
     For this input FindPath must return −1.
 
-##Additional considerations
+## Additional considerations
 
 Consider performance, memory usage and assume that your code may be called from a multi-threaded environment.
