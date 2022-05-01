@@ -1,17 +1,21 @@
 # ParadoxPathfinding
 
-My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) in clean, modern C++. Keep in mind this is from someone that was forced to use C++98 for 3 years.
+My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) using modern-ish C++. The fact used to C++ 98, I used SFML for the UI and the way the problem was structured didn't help in this case :)
 
-I never got it to actually pass the tests before finding another job. At some point I added a UI to better debug the paths it would find. I honestly have no idea why it failed to get approved.
+Made in Visual Studio using MSVC 142 and C++14. I have included only the relevant libraries for Windows x86.
+
+##Projects
+###Submission
+The First Project in the solution (`Submission`) is my actual submission. It's self-reliant and all the code is in one single (very messy) file.
+
+###UIPathFinder
+After failing the acceptance tests I wrote a simple UI to debug the paths it would find and check if there were any edge cases - this is the second project `UIPathFinder`.
 
 Press 1 to set a start point and 2 to set the end point. Use the arrow keys to navigate.
 
-Windows x86 only for now.
+# Original text
 
-Original text
-============
-
-Path-finding
+##Path-finding
 
 Problem ID: paradoxpathTime limit: 5 secondsMemory limit: 1024 MB
 Difficulty
