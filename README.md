@@ -1,6 +1,6 @@
 # ParadoxPathfinding
 
-My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) using modern-ish C++. The fact used to C++ 98, I used SFML for the UI and the way the problem was structured didn't help in this case :)
+My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) using modern-ish C++.
 
 Made in Visual Studio using MSVC 142 and C++14. I have included only the relevant libraries for Windows x86.
 
@@ -51,7 +51,7 @@ The meaning of the parameters are as follows.
 The function must return the length of the shortest path between Start and Target, or −1−1 if no such path exists.
 
 If the shortest path is longer than nOutBufferSize, the calling function might either give up or choose to call FindPath again with a larger output buffer.
-##Constraints
+## Constraints
 
 You may safely assume that:
 
