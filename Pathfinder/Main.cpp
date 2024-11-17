@@ -1,55 +1,53 @@
 #pragma once
 #include <iostream>
-#include "PathFinder.hpp"
-#include "UI/DisplayGridSFML.hpp"
+#include "PathFinder.h"
+#include "UI/DisplayGridSFML.h"
 #include "Utils.hpp"
 
 //This is some fairly old school code so we have to disable a bunch of warnings
 #pragma warning( disable : 26485 26481 26446 26429)
 
-int FindPath(const int nStartX, const int nStartY,
+static int find_path(const int nStartX, const int nStartY,
 	const int nTargetX, const int nTargetY,
 	const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
 	int* pOutBuffer, const int nOutBufferSize) {
 
-	const GridLocation start = Grid::GridLocation(nStartX, nStartY);
-	const GridLocation target = Grid::GridLocation(nTargetX, nTargetY);
+	const auto start = grid::GridLocation(nStartX, nStartY);
+	const auto target = grid::GridLocation(nTargetX, nTargetY);
 
 	if (start == target) {
 		return 0;
 	}
 
-	const Grid::SquareGrid gridData = Grid::SquareGrid(pMap, nMapWidth, nMapHeight);
+	PathFinder path(grid::SquareGrid(pMap, nMapWidth, nMapHeight));
 
-	PathFinder path(gridData);
+	std::list<grid::GridLocation> path_found(nOutBufferSize);
 
-	std::list<GridLocation> pathfound(nOutBufferSize);
+	path.find_path(start, target, utils::manhattan_distance, path_found);
 
-	path.Pathfind(start, target, Utils::ManhattanDistance, pathfound);
-
-	if (pathfound.size() < 1 || pathfound.back() != target) {
+	if (path_found.empty() || path_found.back() != target) {
 		return -1;
 	}
-
+	
 	int i = 0;
-	for (auto const& node : pathfound) {
-		pOutBuffer[i++] = gridData.Coordinates2DToArray(node.x, node.y, nMapWidth);
+	for (auto const& node : path_found) {
+		pOutBuffer[i++] = grid::SquareGrid::coordinates_2d_to_array(node.x, node.y, nMapWidth);
 	}
 
 	
-	return pathfound.size();
+	return static_cast<int>(path_found.size());
 }
 
-void PrintPath(const int* const pOutBuffer1, int length) {
+static void print_path(const int* const pOutBuffer1, int length) {
 
-	std::cout << "\tLength: " << length << std::endl;
+	std::cout << "\tLength: " << length << '\n';
 	std::cout << "\tPath: ";
 	//std::copy(std::begin(pOutBuffer1), std::end(pOutBuffer1), std::ostream_iterator<int>(std::cout, ", "));
 
 	for (int i = 0; i < length; i++) {
 		std::cout << pOutBuffer1[i] << ", ";
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 }
 
 int main() {
@@ -92,11 +90,8 @@ int main() {
 	//std::cout << "#############" << std::endl;
 	
 	//UI
-	const Grid::SquareGrid testGrid = Grid::SquareGrid(pMap3, 20, 10);
-	
-	PathFinder pathfinder = PathFinder(testGrid);
-	DisplayGridSFML disp(testGrid,pathfinder);
-	disp.Run();
+	DisplayGridSFML disp(PathFinder(grid::SquareGrid(pMap3, 20, 10)));
+	disp.run();
 
 	return 0;
 }

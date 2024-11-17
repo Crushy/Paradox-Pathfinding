@@ -1,50 +1,50 @@
-#include "PathFinder.hpp"
+#include "PathFinder.h"
 #include <queue>
-#include <set>
 #include <unordered_map>
 #include "Utils.hpp"
 
-PathFinder::PathFinder(const SquareGrid& gridRef):
-	grid(gridRef),
-	visited()
+bool PathFinder::CandidateRecord::operator<(const CandidateRecord& other) const noexcept
+{
+	return other.estimated_total_cost < estimated_total_cost;
+}
+
+PathFinder::PathFinder(const grid::SquareGrid&& grid_ref):
+	_grid(grid_ref)
 {
 }
 
-bool PathFinder::Pathfind(const GridLocation entry, const GridLocation goal, HeurFn heurist_func, std::list<GridLocation>& results)
+bool PathFinder::find_path(const grid::GridLocation& entry, const grid::GridLocation& goal, heur_fn heuristic_func, std::list<grid::GridLocation>& results)
 {
 	results.clear();
 
-	if (heurist_func == nullptr) {
+	if (heuristic_func == nullptr) {
 		return false;
 	}
 
 	// Can't reach start or destination
-	if (grid.GetElement(goal) == IMPASSABLE || grid.GetElement(entry) == IMPASSABLE) {
+	if (_grid.get_element(goal) == IMPASSABLE || _grid.get_element(entry) == IMPASSABLE) {
 		return false;
 	}
 
-	std::vector<GridLocation> neighbours = std::vector<GridLocation>(grid.max_neighbours);
+	std::vector<grid::GridLocation> neighbours = std::vector<grid::GridLocation>(grid::SquareGrid::max_neighbours);
 
 	visited.clear();// = new std::unordered_map<GridLocation, VisitedRecord, GridLocation::hash_GridLocation>();
 
 	std::priority_queue<CandidateRecord> candidates;
 
-	CandidateRecord startRecord = CandidateRecord
+	CandidateRecord start_record = CandidateRecord
 	{
 		goal,
 		0,
-		heurist_func(entry,goal) * (1.0f + 0.001f)
+		(1.0f + 0.001f) * heuristic_func(entry, goal)
 	};
 
-	candidates.emplace(startRecord);
+	candidates.emplace(start_record);
 	
-	CandidateRecord currentNode = startRecord;
-	//const CandidateRecord* pointer = nullptr;
-	while (candidates.size() > 0) {
-		currentNode = candidates.top();
-		//pointer = &(*candidates.rbegin());
+	while (!candidates.empty()) {
+		CandidateRecord current_node = candidates.top();
 
-		if (currentNode.coordinate == entry)
+		if (current_node.coordinate == entry)
 		{
 			break;
 		}
@@ -54,38 +54,38 @@ bool PathFinder::Pathfind(const GridLocation entry, const GridLocation goal, Heu
 			neighbours.clear();
 
 			//std::cout << "Visiting " << currentNode.coordinate << std::endl;
-			grid.GetNeighbours(currentNode.coordinate, neighbours);
+			_grid.get_neighbours(current_node.coordinate, neighbours);
 
 			for (auto& neighbour : neighbours) {
 				//Don't consider impassable positions
-				if (grid.GetElement(neighbour) == IMPASSABLE) {
+				if (_grid.get_element(neighbour) == IMPASSABLE) {
 					continue;
 				}
-
-				const int costToNext = currentNode.costSoFar + 1; //It always costs 1 to move to the neighbour coordinate
+				
+				const float costToNext = current_node.cost_so_far + MOVE_COST; //It always costs 1 to move to the neighbour coordinate
 
 				//If we weren't visited yet or the current path takes less than a previous approach to this node
 				if (visited.count(neighbour) <= 0) {
-					auto& neighbourRec = visited[neighbour];
-					neighbourRec.costSoFar = costToNext;
-					neighbourRec.previous = currentNode.coordinate;
-					CandidateRecord newRecord = CandidateRecord
+					auto& neighbour_rec = visited[neighbour];
+					neighbour_rec.cost_so_far = costToNext;
+					neighbour_rec.previous = current_node.coordinate;
+					CandidateRecord new_record = CandidateRecord
 					{
 						neighbour,
 						costToNext,
-						costToNext + heurist_func(neighbour, entry) * (1.0f + 0.001f)
+						costToNext + heuristic_func(neighbour, entry) * (1.0f + 0.001f)
 					};
 
-					candidates.emplace(newRecord);
+					candidates.emplace(new_record);
 				}
 				//We found a better path for this node
-				else if (costToNext < visited[neighbour].costSoFar) {
-					auto& neighbourRec = visited[neighbour];
-					neighbourRec.costSoFar = costToNext;
-					neighbourRec.previous = currentNode.coordinate;
-
-					//Check if we already had this candidate
-					//Commented out because travel costs are never 0
+				else if (costToNext < visited[neighbour].cost_so_far) {
+					auto& neighbour_rec = visited[neighbour];
+					neighbour_rec.cost_so_far = costToNext;
+					neighbour_rec.previous = current_node.coordinate;
+					
+					// Check if we already had this candidate to avoid going in circles
+					// Commented out because travel costs are never 0, therefore there is no risk of having an infinite loop
 					/*auto& it = candidates.find(newRecord);
 					if (it != candidates.end() && (*it).costSoFar < newRecord.costSoFar ) {
 						candidates.erase(it);
@@ -96,15 +96,15 @@ bool PathFinder::Pathfind(const GridLocation entry, const GridLocation goal, Heu
 							candidates.erase(candidate);
 						}
 					}*/
-					CandidateRecord newRecord = CandidateRecord
+					CandidateRecord new_record = CandidateRecord
 					{
 						neighbour,
 						costToNext,
-						costToNext + heurist_func(neighbour, entry) * (1.0f + 0.001f)
+						costToNext + heuristic_func(neighbour, entry) * (1.0f + 0.001f)
 					};
 
 					//Better candidates are prioritized here based on the CandidateRecord "<" operator overload
-					candidates.emplace(newRecord);
+					candidates.emplace(new_record);
 					
 						
 				}
@@ -115,19 +115,18 @@ bool PathFinder::Pathfind(const GridLocation entry, const GridLocation goal, Heu
 
 	}
 
-	if (candidates.size() <= 0) {
+	if (candidates.empty()) {
 		return false;
 	}
 	
 	//Get Results
 	{
-		GridLocation aux = entry;
-
+		grid::GridLocation aux = entry;
+		
 		while (aux != goal) {
 			aux = visited[aux].previous;
-			results.push_back(aux);
-		};
-		//results->push_back(goal);
+			results.emplace_back(aux);
+		}
 	}
 	return true;
 }

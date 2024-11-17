@@ -1,19 +1,22 @@
 # ParadoxPathfinding
 
-My attempt at solving the [Paradox Path-finding Challenge](https://paradox.kattis.com/problems/paradoxpath) using modern-ish C++.
+My attempt at solving the [Paradox Path-finding Challenge (dead link)](https://paradox.kattis.com/problems/paradoxpath). The Challenge required writing what amounted to plain old C, but I tried wrapping it in modern-ish C++.
 
-Made in Visual Studio using MSVC 142 and C++14. I have included only the relevant libraries for Windows x86.
+Made in Visual Studio using MSVC 142 and C++14.
 
 ## Projects
 ### Submission
-The First Project in the solution ( `Submission` ) is my actual submission. It's self-reliant and all the code is in one single (very messy) file.
+The First Project in the solution ( `Submission` ) is my actual submission. Due to necessity, it does not rely on any outside code and is it's entirety consists of a single (very messy) file.
 
 ### UIPathFinder
-After failing the acceptance tests I wrote a simple UI to debug the paths it would find and check if there were any edge cases - this is the second project, `UIPathFinder`.
+I wrote a simple UI in SMFL 2.5.1 to debug the paths it would find and check if there were any edge cases I missed - this is the second project, `UIPathFinder`.
+
+I have included only the relevant libraries for Windows x86. Only runs in x86 until I can be arsed to change that.
 
 Press 1 to set a start point and 2 to set the end point. Use the arrow keys to navigate.
 
-# Original text
+# Problem Description
+(Including typos, minimal formatting fixes)
 
 ## Path-finding
 
@@ -31,7 +34,7 @@ Note that this specific problem can only be solved using C++.
 
 Your algorithm should provide an implementation of the following function declaration.
 
-int FindPath(const int nStartX, const int nStartY,
+    int FindPath(const int nStartX, const int nStartY,
              const int nTargetX, const int nTargetY, 
              const unsigned char* pMap, const int nMapWidth, const int nMapHeight,
              int* pOutBuffer, const int nOutBufferSize);
@@ -48,9 +51,9 @@ The meaning of the parameters are as follows.
 
     nOutBufferSize is the maximum number of entries that can be written to pOutBuffer.
 
-The function must return the length of the shortest path between Start and Target, or −1−1 if no such path exists.
+The function must return the length of the shortest path between Start and Target, or −1 if no such path exists.
 
-If the shortest path is longer than nOutBufferSize, the calling function might either give up or choose to call FindPath again with a larger output buffer.
+If the shortest path is longer than `nOutBufferSize`, the calling function might either give up or choose to call FindPath again with a larger output buffer.
 ## Constraints
 
 You may safely assume that:

@@ -21,19 +21,17 @@
   <ItemGroup>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PathFinder.cpp" />
+    <ClCompile Include="SquareGrid.cpp" />
     <ClCompile Include="UI\DisplayGridSFML.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="PathFinder.hpp" />
+    <ClInclude Include="PathFinder.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="SquareGrid.hpp" />
+    <ClInclude Include="SquareGrid.h" />
     <ClInclude Include="UI\Colors.h" />
-    <ClInclude Include="UI\DisplayGridSFML.hpp" />
+    <ClInclude Include="UI\DisplayGridSFML.h" />
     <ClInclude Include="UI\FPS.hpp" />
     <ClInclude Include="Utils.hpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="Resources\AnkaCoder-b.ttf" />
